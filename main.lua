@@ -608,13 +608,13 @@ function updateShake(dt)
 end
 
 function calculateLevel()
-    return math.floor(((player.totalReps / 10)) + ((player.maxLift / 50)))
+    return math.floor(player.totalReps / 10)
 end
 
 function updatePlayerLevel()
     local oldLevel = player.level
     player.level = calculateLevel()
-    player.maxHealth = 100 + (player.level) * 65
+    player.maxHealth = (player.level) * player.maxLift
     player.health = player.maxHealth
     
     if player.level > oldLevel then
@@ -1156,7 +1156,7 @@ function drawTradingCard()
     love.graphics.print("Stats", cardX + 30, cardY + 230)
     love.graphics.setNewFont(11)
     
-    local xpNeeded = player.level * 100
+    local xpNeeded = player.level * 80
     local stats = {
         "XP: " .. (player.totalReps % 100) .. " / " .. xpNeeded,
         "Badges: " .. #badges .. " / " .. #bosses,
