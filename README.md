@@ -5,7 +5,7 @@
 What the Fit???
 
 ## How to Run:
-Windows: Download LOVE2D, drag and drop the repo directory onto the love.exe file.
+Windows: Download [LÖVE2D](https://www.love2d.org/), drag and drop the repo directory onto the love.exe file.
 
 ## Compilation Instructions:
 https://www.love2d.org/wiki/Game_Distribution
