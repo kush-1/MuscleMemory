@@ -608,7 +608,7 @@ function updateShake(dt)
 end
 
 function calculateLevel()
-    return math.floor(((player.totalReps / 100) + 1) + ((player.maxLift / 100) + 1))
+    return math.floor(((player.totalReps / 100)) + ((player.maxLift / 100)))
 end
 
 function updatePlayerLevel()
