@@ -729,7 +729,7 @@ end
 function updatePlayerLevel()
     local oldLevel = player.level
     player.level = calculateLevel()
-    player.maxHealth = (player.level) * player.maxLift
+    player.maxHealth = (player.level) * math.floor(player.maxLift / 100)
     player.health = player.maxHealth
     
     if player.level > oldLevel then
@@ -739,7 +739,7 @@ function updatePlayerLevel()
 end
 
 function getPlayerAttack()
-    return 10 + player.level * 6
+    return 10 + player.level * 5
 end
 
 function getBossHealth(stage)
