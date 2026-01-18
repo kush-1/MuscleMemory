@@ -1,8 +1,8 @@
 -- ============================================================================
--- MUSCLE MEMORY: FIT HAPPENS - FINAL VERSION
--- A gamified fitness tracker for LOVE2D
--- Combines shape-based graphics with robust progression system
+-- MUSCLE MEMORY: FIT HAPPENS
+-- A gamified fitness tracker made with LOVE2D
 -- ============================================================================
+
 
 -- ============================================================================
 -- GLOBAL STATE & DATA
