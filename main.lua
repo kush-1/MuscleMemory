@@ -608,13 +608,13 @@ function updateShake(dt)
 end
 
 function calculateLevel()
-    return math.floor(player.totalReps / 100) + 1
+    return math.floor(((player.totalReps / 10)) + ((player.maxLift / 50)))
 end
 
 function updatePlayerLevel()
     local oldLevel = player.level
     player.level = calculateLevel()
-    player.maxHealth = 100 + (player.level - 1) * 20
+    player.maxHealth = 100 + (player.level) * 65
     player.health = player.maxHealth
     
     if player.level > oldLevel then
@@ -624,15 +624,15 @@ function updatePlayerLevel()
 end
 
 function getPlayerAttack()
-    return 10 + player.level * 3
+    return 10 + player.level * 6
 end
 
 function getBossHealth(stage)
-    return 100 + stage * 50
+    return 100 + bosses[stage].level * (stage + 3)
 end
 
 function getBossAttack(stage)
-    return 5 + stage * 2
+    return 5 + stage * math.floor((bosses[stage].level / 10))
 end
 
 -- ============================================================================
@@ -1272,6 +1272,7 @@ function updateDungeonCombat(dt)
             addShake(15)
             
             player.totalReps = 0
+            player.maxLift = 0
             player.level = 1
             player.dungeonProgress = 1
             updatePlayerLevel()
