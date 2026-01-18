@@ -4,6 +4,12 @@
 
 What the Fit???
 
+## How to Run:
+Windows: Download LOVE2D, drag and drop the repo directory onto the love.exe file.
+
+## Compilation Instructions:
+https://www.love2d.org/wiki/Game_Distribution
+
 ## Inspiration
 The inspiration for Muscle Memory came from a simple question: "What if logging your workouts felt more like playing a game?"
 
