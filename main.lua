@@ -28,6 +28,8 @@ local workoutLog = {}
 -- Gym Input State
 local gymWeight = 0
 local gymReps = 0
+local gymName = ""
+local gymNameActive = false
 
 -- Dungeon State
 local dungeon = {
@@ -160,12 +162,16 @@ end
 function love.textinput(t)
     if nameActive then
         nameInput = nameInput .. t
+    elseif gymNameActive and #gymName < 50 then
+        gymName = gymName .. t
     end
 end
 
 function love.keypressed(key)
     if nameActive and key == "backspace" then
         nameInput = nameInput:sub(1, -2)
+    elseif gymNameActive and key == "backspace" then
+        gymName = gymName:sub(1, -2)
     end
 end
 
@@ -663,7 +669,7 @@ function saveGame()
     str = str .. "maxHealth=" .. data.maxHealth .. "\n"
     
     for _, log in ipairs(data.workoutLog) do
-        str = str .. "log=" .. log.date .. "," .. log.weight .. "," .. log.reps .. "\n"
+        str = str .. "log=" .. (log.name or "Workout") .. "," .. log.date .. "," .. log.weight .. "," .. log.reps .. "\n"
     end
     
     for _, badge in ipairs(data.badges) do
@@ -696,8 +702,9 @@ function loadGame()
         elseif key == "maxHealth" then
             player.maxHealth = tonumber(value)
         elseif key == "log" then
-            local date, weight, reps = value:match("([^,]+),([^,]+),(.+)")
+            local name, date, weight, reps = value:match("([^,]+),([^,]+),([^,]+),(.+)")
             table.insert(workoutLog, {
+                name = name,
                 date = date,
                 weight = tonumber(weight),
                 reps = tonumber(reps)
@@ -868,21 +875,29 @@ function drawGym()
     love.graphics.setColor(1, 1, 1)
     love.graphics.printf("GYM", 0, 30, WINDOW_W, "center")
     
-    love.graphics.printf("Weight (lbs):", 0, 100, WINDOW_W, "center")
+    love.graphics.printf("Workout Name:", 0, 70, WINDOW_W, "center")
     love.graphics.setColor(0.2, 0.2, 0.3)
     local inputX = (WINDOW_W - 280) / 2
-    love.graphics.rectangle("fill", inputX, 130, 280, 40, 5)
+    love.graphics.rectangle("fill", inputX, 100, 280, 40, 5)
     love.graphics.setColor(1, 1, 1)
-    love.graphics.rectangle("line", inputX, 130, 280, 40, 5)
-    love.graphics.printf(tostring(gymWeight), inputX, 142, 280, "center")
+    love.graphics.rectangle("line", inputX, 100, 280, 40, 5)
+    local displayName = gymName ~= "" and gymName or "Workout"
+    love.graphics.printf(displayName, inputX, 112, 280, "center")
+    
+    love.graphics.printf("Weight (lbs):", 0, 160, WINDOW_W, "center")
+    love.graphics.setColor(0.2, 0.2, 0.3)
+    love.graphics.rectangle("fill", inputX, 190, 280, 40, 5)
+    love.graphics.setColor(1, 1, 1)
+    love.graphics.rectangle("line", inputX, 190, 280, 40, 5)
+    love.graphics.printf(tostring(gymWeight), inputX, 202, 280, "center")
     
     local mx, my = love.mouse.getPosition()
     
     local wBtns = {
-        {text="-10", x=(WINDOW_W - 280)/2, y=180, w=55, h=35},
-        {text="-1", x=(WINDOW_W - 280)/2 + 65, y=180, w=55, h=35},
-        {text="+1", x=(WINDOW_W - 280)/2 + 160, y=180, w=55, h=35},
-        {text="+10", x=(WINDOW_W - 280)/2 + 225, y=180, w=55, h=35}
+        {text="-10", x=(WINDOW_W - 280)/2, y=240, w=55, h=35},
+        {text="-1", x=(WINDOW_W - 280)/2 + 65, y=240, w=55, h=35},
+        {text="+1", x=(WINDOW_W - 280)/2 + 160, y=240, w=55, h=35},
+        {text="+10", x=(WINDOW_W - 280)/2 + 225, y=240, w=55, h=35}
     }
     
     for _, btn in ipairs(wBtns) do
@@ -890,20 +905,20 @@ function drawGym()
     end
     
     love.graphics.setColor(1, 1, 1)
-    love.graphics.printf("Reps:", 0, 240, WINDOW_W, "center")
+    love.graphics.printf("Reps:", 0, 300, WINDOW_W, "center")
     love.graphics.setColor(0.2, 0.2, 0.3)
-    love.graphics.rectangle("fill", inputX, 270, 280, 40, 5)
+    love.graphics.rectangle("fill", inputX, 330, 280, 40, 5)
     love.graphics.setColor(1, 1, 1)
-    love.graphics.rectangle("line", inputX, 270, 280, 40, 5)
-    love.graphics.printf(tostring(gymReps), inputX, 282, 280, "center")
+    love.graphics.rectangle("line", inputX, 330, 280, 40, 5)
+    love.graphics.printf(tostring(gymReps), inputX, 342, 280, "center")
     
     local rBtns = {
-        {text="-100", x=(WINDOW_W - 280)/2, y=320, w=60, h=35},
-        {text="-10", x=(WINDOW_W - 280)/2 + 70, y=320, w=55, h=35},
-        {text="-1", x=(WINDOW_W - 280)/2 + 135, y=320, w=45, h=35},
-        {text="+1", x=(WINDOW_W - 280)/2 + 190, y=320, w=45, h=35},
-        {text="+10", x=(WINDOW_W - 280)/2, y=365, w=55, h=35},
-        {text="+100", x=(WINDOW_W - 280)/2 + 65, y=365, w=60, h=35}
+        {text="-100", x=(WINDOW_W - 280)/2, y=380, w=60, h=35},
+        {text="-10", x=(WINDOW_W - 280)/2 + 70, y=380, w=55, h=35},
+        {text="-1", x=(WINDOW_W - 280)/2 + 135, y=380, w=45, h=35},
+        {text="+1", x=(WINDOW_W - 280)/2 + 190, y=380, w=45, h=35},
+        {text="+10", x=(WINDOW_W - 280)/2, y=425, w=55, h=35},
+        {text="+100", x=(WINDOW_W - 280)/2 + 65, y=425, w=60, h=35}
     }
     
     for _, btn in ipairs(rBtns) do
@@ -911,18 +926,27 @@ function drawGym()
     end
     
     if gymReps > 0 and gymWeight > 0 then
-        button("LOG WORKOUT", (WINDOW_W - 200)/2, 430, 200, 50, isInside(mx, my, (WINDOW_W - 200)/2, 430, 200, 50))
+        button("LOG WORKOUT", (WINDOW_W - 200)/2, 490, 200, 50, isInside(mx, my, (WINDOW_W - 200)/2, 490, 200, 50))
     end
     
-    button("BACK", (WINDOW_W - 140)/2, 550, 140, 45, isInside(mx, my, (WINDOW_W - 140)/2, 550, 140, 45))
+    button("BACK", (WINDOW_W - 140)/2, 610, 140, 45, isInside(mx, my, (WINDOW_W - 140)/2, 610, 140, 45))
 end
 
 function handleGymClick(x, y)
+    -- Check if clicking on workout name input
+    local inputX = (WINDOW_W - 280) / 2
+    if isInside(x, y, inputX, 100, 280, 40) then
+        gymNameActive = true
+        return
+    else
+        gymNameActive = false
+    end
+    
     local wBtns = {
-        {text="-10", x=(WINDOW_W - 280)/2, y=180, w=55, h=35, val=-10},
-        {text="-1", x=(WINDOW_W - 280)/2 + 65, y=180, w=55, h=35, val=-1},
-        {text="+1", x=(WINDOW_W - 280)/2 + 160, y=180, w=55, h=35, val=1},
-        {text="+10", x=(WINDOW_W - 280)/2 + 225, y=180, w=55, h=35, val=10}
+        {text="-10", x=(WINDOW_W - 280)/2, y=240, w=55, h=35, val=-10},
+        {text="-1", x=(WINDOW_W - 280)/2 + 65, y=240, w=55, h=35, val=-1},
+        {text="+1", x=(WINDOW_W - 280)/2 + 160, y=240, w=55, h=35, val=1},
+        {text="+10", x=(WINDOW_W - 280)/2 + 225, y=240, w=55, h=35, val=10}
     }
     
     for _, btn in ipairs(wBtns) do
@@ -934,12 +958,12 @@ function handleGymClick(x, y)
     end
     
     local rBtns = {
-        {text="-100", x=(WINDOW_W - 280)/2, y=320, w=60, h=35, val=-100},
-        {text="-10", x=(WINDOW_W - 280)/2 + 70, y=320, w=55, h=35, val=-10},
-        {text="-1", x=(WINDOW_W - 280)/2 + 135, y=320, w=45, h=35, val=-1},
-        {text="+1", x=(WINDOW_W - 280)/2 + 190, y=320, w=45, h=35, val=1},
-        {text="+10", x=(WINDOW_W - 280)/2, y=365, w=55, h=35, val=10},
-        {text="+100", x=(WINDOW_W - 280)/2 + 65, y=365, w=60, h=35, val=100}
+        {text="-100", x=(WINDOW_W - 280)/2, y=380, w=60, h=35, val=-100},
+        {text="-10", x=(WINDOW_W - 280)/2 + 70, y=380, w=55, h=35, val=-10},
+        {text="-1", x=(WINDOW_W - 280)/2 + 135, y=380, w=45, h=35, val=-1},
+        {text="+1", x=(WINDOW_W - 280)/2 + 190, y=380, w=45, h=35, val=1},
+        {text="+10", x=(WINDOW_W - 280)/2, y=425, w=55, h=35, val=10},
+        {text="+100", x=(WINDOW_W - 280)/2 + 65, y=425, w=60, h=35, val=100}
     }
     
     for _, btn in ipairs(rBtns) do
@@ -951,29 +975,34 @@ function handleGymClick(x, y)
         end
     end
     
-    if gymReps > 0 and gymWeight > 0 and isInside(x, y, (WINDOW_W - 200)/2, 430, 200, 50) then
+    if gymReps > 0 and gymWeight > 0 and isInside(x, y, (WINDOW_W - 200)/2, 490, 200, 50) then
         player.totalReps = player.totalReps + gymReps
         player.maxLift = math.max(player.maxLift, gymWeight)
         
+        local workoutName = gymName ~= "" and gymName or "Workout"
         table.insert(workoutLog, 1, {
+            name = workoutName,
             date = os.date("%Y-%m-%d %H:%M"),
             weight = gymWeight,
             reps = gymReps
         })
         
         updatePlayerLevel()
-        addParticles(WINDOW_W/2, 455, 40, {0, 1, 0})
+        addParticles(WINDOW_W/2, 515, 40, {0, 1, 0})
         addShake(10)
         
         gymReps = 0
         gymWeight = 0
+        gymName = ""
+        gymNameActive = false
         saveGame()
         return
     end
     
-    if isInside(x, y, (WINDOW_W - 140)/2, 550, 140, 45) then
+    if isInside(x, y, (WINDOW_W - 140)/2, 610, 140, 45) then
         STATE = "HUB"
-        addParticles(WINDOW_W/2, 572, 10, {1, 0.5, 0})
+        gymNameActive = false
+        addParticles(WINDOW_W/2, 632, 10, {1, 0.5, 0})
     end
 end
 
@@ -1030,23 +1059,24 @@ function drawLog()
         for i = 1, math.min(10, #workoutLog) do
             local log = workoutLog[i]
             love.graphics.setColor(0.2, 0.2, 0.3)
-            love.graphics.rectangle("fill", logX, y, 400, 50, 5)
+            love.graphics.rectangle("fill", logX, y, 400, 60, 5)
             love.graphics.setColor(1, 1, 1)
-            love.graphics.rectangle("line", logX, y, 400, 50, 5)
-            love.graphics.printf(log.date, logX + 10, y + 5, 380, "left")
-            love.graphics.printf(log.weight .. " lbs x " .. log.reps .. " reps", logX + 10, y + 25, 380, "left")
-            y = y + 60
+            love.graphics.rectangle("line", logX, y, 400, 60, 5)
+            love.graphics.printf(log.name or "Workout", logX + 10, y + 5, 380, "left")
+            love.graphics.printf(log.date, logX + 10, y + 22, 380, "left")
+            love.graphics.printf(log.weight .. " lbs x " .. log.reps .. " reps", logX + 10, y + 39, 380, "left")
+            y = y + 70
         end
     end
     
     local mx, my = love.mouse.getPosition()
-    button("BACK", (WINDOW_W - 140)/2, 650, 140, 45, isInside(mx, my, (WINDOW_W - 140)/2, 650, 140, 45))
+    button("BACK", (WINDOW_W - 140)/2, 720, 140, 45, isInside(mx, my, (WINDOW_W - 140)/2, 720, 140, 45))
 end
 
 function handleLogClick(x, y)
-    if isInside(x, y, (WINDOW_W - 140)/2, 650, 140, 45) then
+    if isInside(x, y, (WINDOW_W - 140)/2, 720, 140, 45) then
         STATE = "HUB"
-        addParticles(WINDOW_W/2, 672, 10, {1, 0.5, 0})
+        addParticles(WINDOW_W/2, 742, 10, {1, 0.5, 0})
     end
 end
 
