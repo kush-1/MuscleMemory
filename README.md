@@ -1,5 +1,6 @@
-# MuscleMemory
-Fit Happens
+# Muscle Memory: Fit Happens
+
+<img width="1024" height="1024" alt="image" src="https://github.com/user-attachments/assets/43067f47-cc83-4cd4-a860-e859bce5a31b" />
 
 What the Fit???
 
