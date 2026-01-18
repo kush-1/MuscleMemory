@@ -67,7 +67,7 @@ local animals = {
 }
 
 -- Boss Data with names and characteristics
-local bosses = {
+local bosses = { 
     {name = "Iron Golem", level = 10, color = {0.5, 0.5, 0.5}},
     {name = "Shadow Beast", level = 30, color = {0.3, 0.2, 0.4}},
     {name = "Fire Dragon", level = 50, color = {0.9, 0.3, 0.1}},
@@ -608,13 +608,13 @@ function updateShake(dt)
 end
 
 function calculateLevel()
-    return math.floor(((player.totalReps / 100)) + ((player.maxLift / 100)))
+    return math.floor(player.totalReps / 100) + 1
 end
 
 function updatePlayerLevel()
     local oldLevel = player.level
     player.level = calculateLevel()
-    player.maxHealth = 100 + (player.level - 1) * 20 
+    player.maxHealth = 100 + (player.level - 1) * 20
     player.health = player.maxHealth
     
     if player.level > oldLevel then
@@ -721,13 +721,13 @@ function drawStart()
     love.graphics.printf("Fit Happens", 0, 290, WINDOW_W, "center")
     
     local mx, my = love.mouse.getPosition()
-    local startBtn = {x=140, y=450, w=200, h=60}
+    local startBtn = {x=(WINDOW_W - 200)/2, y=450, w=200, h=60}
     button("START", startBtn.x, startBtn.y, startBtn.w, startBtn.h, 
            isInside(mx, my, startBtn.x, startBtn.y, startBtn.w, startBtn.h))
 end
 
 function handleStartClick(x, y)
-    if isInside(x, y, 140, 450, 200, 60) then
+    if isInside(x, y, (WINDOW_W - 200)/2, 450, 200, 60) then
         STATE = "PICK_PET"
         addParticles(WINDOW_W/2, 480, 15, {0, 1, 1})
     end
@@ -763,13 +763,14 @@ function drawPickPet()
     if player.animal then
         love.graphics.printf("Name your buddy:", 0, 640, WINDOW_W, "center")
         love.graphics.setColor(0.2, 0.2, 0.3)
-        love.graphics.rectangle("fill", 120, 675, 240, 35, 5)
+        local inputX = (WINDOW_W - 240) / 2
+        love.graphics.rectangle("fill", inputX, 675, 240, 35, 5)
         love.graphics.setColor(1, 1, 1)
-        love.graphics.rectangle("line", 120, 675, 240, 35, 5)
-        love.graphics.printf(nameInput, 120, 683, 240, "center")
+        love.graphics.rectangle("line", inputX, 675, 240, 35, 5)
+        love.graphics.printf(nameInput, inputX, 683, 240, "center")
         
         if nameInput ~= "" then
-            button("CONFIRM", 170, 730, 140, 50, isInside(mx, my, 170, 730, 140, 50))
+            button("CONFIRM", (WINDOW_W - 140)/2, 730, 140, 50, isInside(mx, my, (WINDOW_W - 140)/2, 730, 140, 50))
         end
     end
 end
@@ -787,7 +788,7 @@ function handlePickPetClick(x, y)
         py = py + 140
     end
     
-    if player.animal and nameInput ~= "" and isInside(x, y, 170, 730, 140, 50) then
+    if player.animal and nameInput ~= "" and isInside(x, y, (WINDOW_W - 140)/2, 730, 140, 50) then
         player.name = nameInput
         nameActive = false
         updatePlayerLevel()
@@ -833,7 +834,7 @@ function drawHub()
     }
     
     for _, btn in ipairs(btns) do
-        button(btn.text, 170, btn.y, 140, 50, isInside(mx, my, 170, btn.y, 140, 50))
+        button(btn.text, (WINDOW_W - 140)/2, btn.y, 140, 50, isInside(mx, my, (WINDOW_W - 140)/2, btn.y, 140, 50))
     end
 end
 
@@ -848,13 +849,13 @@ function handleHubClick(x, y)
     }
     
     for _, btn in ipairs(btns) do
-        if isInside(x, y, 170, btn.y, 140, 50) then
+        if isInside(x, y, (WINDOW_W - 140)/2, btn.y, 140, 50) then
             if btn.state == "DUNGEON" then
                 startDungeon()
             else
                 STATE = btn.state
             end
-            addParticles(240, btn.y + 25, 10, {0, 0.7, 1})
+            addParticles(WINDOW_W/2, btn.y + 25, 10, {0, 0.7, 1})
             return
         end
     end
@@ -867,20 +868,21 @@ function drawGym()
     love.graphics.setColor(1, 1, 1)
     love.graphics.printf("GYM", 0, 30, WINDOW_W, "center")
     
-    love.graphics.printf("Weight (lbs):", 40, 100, 280, "left")
+    love.graphics.printf("Weight (lbs):", 0, 100, WINDOW_W, "center")
     love.graphics.setColor(0.2, 0.2, 0.3)
-    love.graphics.rectangle("fill", 40, 130, 280, 40, 5)
+    local inputX = (WINDOW_W - 280) / 2
+    love.graphics.rectangle("fill", inputX, 130, 280, 40, 5)
     love.graphics.setColor(1, 1, 1)
-    love.graphics.rectangle("line", 40, 130, 280, 40, 5)
-    love.graphics.printf(tostring(gymWeight), 40, 142, 280, "center")
+    love.graphics.rectangle("line", inputX, 130, 280, 40, 5)
+    love.graphics.printf(tostring(gymWeight), inputX, 142, 280, "center")
     
     local mx, my = love.mouse.getPosition()
     
     local wBtns = {
-        {text="-10", x=40, y=180, w=55, h=35},
-        {text="-1", x=105, y=180, w=55, h=35},
-        {text="+1", x=200, y=180, w=55, h=35},
-        {text="+10", x=265, y=180, w=55, h=35}
+        {text="-10", x=(WINDOW_W - 280)/2, y=180, w=55, h=35},
+        {text="-1", x=(WINDOW_W - 280)/2 + 65, y=180, w=55, h=35},
+        {text="+1", x=(WINDOW_W - 280)/2 + 160, y=180, w=55, h=35},
+        {text="+10", x=(WINDOW_W - 280)/2 + 225, y=180, w=55, h=35}
     }
     
     for _, btn in ipairs(wBtns) do
@@ -888,20 +890,20 @@ function drawGym()
     end
     
     love.graphics.setColor(1, 1, 1)
-    love.graphics.printf("Reps:", 40, 240, 280, "left")
+    love.graphics.printf("Reps:", 0, 240, WINDOW_W, "center")
     love.graphics.setColor(0.2, 0.2, 0.3)
-    love.graphics.rectangle("fill", 40, 270, 280, 40, 5)
+    love.graphics.rectangle("fill", inputX, 270, 280, 40, 5)
     love.graphics.setColor(1, 1, 1)
-    love.graphics.rectangle("line", 40, 270, 280, 40, 5)
-    love.graphics.printf(tostring(gymReps), 40, 282, 280, "center")
+    love.graphics.rectangle("line", inputX, 270, 280, 40, 5)
+    love.graphics.printf(tostring(gymReps), inputX, 282, 280, "center")
     
     local rBtns = {
-        {text="-100", x=40, y=320, w=60, h=35},
-        {text="-10", x=110, y=320, w=55, h=35},
-        {text="-1", x=175, y=320, w=45, h=35},
-        {text="+1", x=230, y=320, w=45, h=35},
-        {text="+10", x=40, y=365, w=55, h=35},
-        {text="+100", x=105, y=365, w=60, h=35}
+        {text="-100", x=(WINDOW_W - 280)/2, y=320, w=60, h=35},
+        {text="-10", x=(WINDOW_W - 280)/2 + 70, y=320, w=55, h=35},
+        {text="-1", x=(WINDOW_W - 280)/2 + 135, y=320, w=45, h=35},
+        {text="+1", x=(WINDOW_W - 280)/2 + 190, y=320, w=45, h=35},
+        {text="+10", x=(WINDOW_W - 280)/2, y=365, w=55, h=35},
+        {text="+100", x=(WINDOW_W - 280)/2 + 65, y=365, w=60, h=35}
     }
     
     for _, btn in ipairs(rBtns) do
@@ -909,18 +911,18 @@ function drawGym()
     end
     
     if gymReps > 0 and gymWeight > 0 then
-        button("LOG WORKOUT", 80, 430, 200, 50, isInside(mx, my, 80, 430, 200, 50))
+        button("LOG WORKOUT", (WINDOW_W - 200)/2, 430, 200, 50, isInside(mx, my, (WINDOW_W - 200)/2, 430, 200, 50))
     end
     
-    button("BACK", 110, 550, 140, 45, isInside(mx, my, 110, 550, 140, 45))
+    button("BACK", (WINDOW_W - 140)/2, 550, 140, 45, isInside(mx, my, (WINDOW_W - 140)/2, 550, 140, 45))
 end
 
 function handleGymClick(x, y)
     local wBtns = {
-        {text="-10", x=40, y=180, w=55, h=35, val=-10},
-        {text="-1", x=105, y=180, w=55, h=35, val=-1},
-        {text="+1", x=200, y=180, w=55, h=35, val=1},
-        {text="+10", x=265, y=180, w=55, h=35, val=10}
+        {text="-10", x=(WINDOW_W - 280)/2, y=180, w=55, h=35, val=-10},
+        {text="-1", x=(WINDOW_W - 280)/2 + 65, y=180, w=55, h=35, val=-1},
+        {text="+1", x=(WINDOW_W - 280)/2 + 160, y=180, w=55, h=35, val=1},
+        {text="+10", x=(WINDOW_W - 280)/2 + 225, y=180, w=55, h=35, val=10}
     }
     
     for _, btn in ipairs(wBtns) do
@@ -932,12 +934,12 @@ function handleGymClick(x, y)
     end
     
     local rBtns = {
-        {text="-100", x=40, y=320, w=60, h=35, val=-100},
-        {text="-10", x=110, y=320, w=55, h=35, val=-10},
-        {text="-1", x=175, y=320, w=45, h=35, val=-1},
-        {text="+1", x=230, y=320, w=45, h=35, val=1},
-        {text="+10", x=40, y=365, w=55, h=35, val=10},
-        {text="+100", x=105, y=365, w=60, h=35, val=100}
+        {text="-100", x=(WINDOW_W - 280)/2, y=320, w=60, h=35, val=-100},
+        {text="-10", x=(WINDOW_W - 280)/2 + 70, y=320, w=55, h=35, val=-10},
+        {text="-1", x=(WINDOW_W - 280)/2 + 135, y=320, w=45, h=35, val=-1},
+        {text="+1", x=(WINDOW_W - 280)/2 + 190, y=320, w=45, h=35, val=1},
+        {text="+10", x=(WINDOW_W - 280)/2, y=365, w=55, h=35, val=10},
+        {text="+100", x=(WINDOW_W - 280)/2 + 65, y=365, w=60, h=35, val=100}
     }
     
     for _, btn in ipairs(rBtns) do
@@ -949,7 +951,7 @@ function handleGymClick(x, y)
         end
     end
     
-    if gymReps > 0 and gymWeight > 0 and isInside(x, y, 80, 430, 200, 50) then
+    if gymReps > 0 and gymWeight > 0 and isInside(x, y, (WINDOW_W - 200)/2, 430, 200, 50) then
         player.totalReps = player.totalReps + gymReps
         player.maxLift = math.max(player.maxLift, gymWeight)
         
@@ -969,9 +971,9 @@ function handleGymClick(x, y)
         return
     end
     
-    if isInside(x, y, 110, 550, 140, 45) then
+    if isInside(x, y, (WINDOW_W - 140)/2, 550, 140, 45) then
         STATE = "HUB"
-        addParticles(180, 572, 10, {1, 0.5, 0})
+        addParticles(WINDOW_W/2, 572, 10, {1, 0.5, 0})
     end
 end
 
@@ -998,18 +1000,18 @@ function drawStats()
     
     local y = 220
     for _, stat in ipairs(stats) do
-        love.graphics.printf(stat, 40, y, 280, "left")
+        love.graphics.printf(stat, 0, y, WINDOW_W, "center")
         y = y + 35
     end
     
     local mx, my = love.mouse.getPosition()
-    button("BACK", 110, 550, 140, 45, isInside(mx, my, 110, 550, 140, 45))
+    button("BACK", (WINDOW_W - 140)/2, 550, 140, 45, isInside(mx, my, (WINDOW_W - 140)/2, 550, 140, 45))
 end
 
 function handleStatsClick(x, y)
-    if isInside(x, y, 110, 550, 140, 45) then
+    if isInside(x, y, (WINDOW_W - 140)/2, 550, 140, 45) then
         STATE = "HUB"
-        addParticles(180, 572, 10, {1, 0.5, 0})
+        addParticles(WINDOW_W/2, 572, 10, {1, 0.5, 0})
     end
 end
 
@@ -1024,26 +1026,27 @@ function drawLog()
         love.graphics.printf("No workouts logged yet!", 0, 200, WINDOW_W, "center")
     else
         local y = 80
+        local logX = (WINDOW_W - 400) / 2
         for i = 1, math.min(10, #workoutLog) do
             local log = workoutLog[i]
             love.graphics.setColor(0.2, 0.2, 0.3)
-            love.graphics.rectangle("fill", 20, y, 320, 50, 5)
+            love.graphics.rectangle("fill", logX, y, 400, 50, 5)
             love.graphics.setColor(1, 1, 1)
-            love.graphics.rectangle("line", 20, y, 320, 50, 5)
-            love.graphics.printf(log.date, 30, y + 5, 300, "left")
-            love.graphics.printf(log.weight .. " lbs x " .. log.reps .. " reps", 30, y + 25, 300, "left")
+            love.graphics.rectangle("line", logX, y, 400, 50, 5)
+            love.graphics.printf(log.date, logX + 10, y + 5, 380, "left")
+            love.graphics.printf(log.weight .. " lbs x " .. log.reps .. " reps", logX + 10, y + 25, 380, "left")
             y = y + 60
         end
     end
     
     local mx, my = love.mouse.getPosition()
-    button("BACK", 110, 580, 140, 45, isInside(mx, my, 110, 580, 140, 45))
+    button("BACK", (WINDOW_W - 140)/2, 650, 140, 45, isInside(mx, my, (WINDOW_W - 140)/2, 650, 140, 45))
 end
 
 function handleLogClick(x, y)
-    if isInside(x, y, 110, 580, 140, 45) then
+    if isInside(x, y, (WINDOW_W - 140)/2, 650, 140, 45) then
         STATE = "HUB"
-        addParticles(180, 602, 10, {1, 0.5, 0})
+        addParticles(WINDOW_W/2, 672, 10, {1, 0.5, 0})
     end
 end
 
@@ -1055,10 +1058,14 @@ function drawBadges()
     love.graphics.printf("BADGE COLLECTION", 0, 30, WINDOW_W, "center")
     love.graphics.printf("Badges: " .. #badges .. " / " .. #bosses, 0, 55, WINDOW_W, "center")
     
+    -- Center the badge grid - 3 columns of badges at 120px spacing
+    local totalGridWidth = 3 * 90 -- 3 badges per row, each taking ~90px of space
+    local gridStartX = (WINDOW_W - totalGridWidth) / 2
+    
     for i = 1, #bosses do
         local col = (i - 1) % 3
         local row = math.floor((i - 1) / 3)
-        local x = 90 + col * 90
+        local x = gridStartX + col * 120 + 45 -- 45 is half the badge spacing to center each badge
         local y = 110 + row * 110
         
         local boss = bosses[i]
@@ -1089,18 +1096,18 @@ function drawBadges()
         
         love.graphics.setColor(1, 1, 1)
         love.graphics.setNewFont(9)
-        love.graphics.printf(boss.name, x - 40, y + 35, 80, "center")
+        love.graphics.printf(boss.name, x - 50, y + 35, 100, "center")
         love.graphics.setNewFont(14)
     end
     
     local mx, my = love.mouse.getPosition()
-    button("BACK", 110, 580, 140, 40, isInside(mx, my, 110, 580, 140, 40))
+    button("BACK", (WINDOW_W - 140)/2, 720, 140, 50, isInside(mx, my, (WINDOW_W - 140)/2, 720, 140, 50))
 end
 
 function handleBadgesClick(x, y)
-    if isInside(x, y, 110, 580, 140, 40) then
+    if isInside(x, y, (WINDOW_W - 140)/2, 720, 140, 50) then
         STATE = "HUB"
-        addParticles(180, 600, 10, {1, 0.5, 0})
+        addParticles(WINDOW_W/2, 745, 10, {1, 0.5, 0})
     end
 end
 
@@ -1111,8 +1118,9 @@ function drawTradingCard()
     love.graphics.setColor(1, 1, 1)
     love.graphics.printf("TRADING CARD", 0, 20, WINDOW_W, "center")
     
-    local cardX, cardY = 30, 70
     local cardW, cardH = 300, 500
+    local cardX = (WINDOW_W - cardW) / 2
+    local cardY = 70
     
     love.graphics.setColor(0.1, 0.1, 0.1, 0.3)
     love.graphics.rectangle("fill", cardX + 5, cardY + 5, cardW, cardH, 15)
@@ -1192,13 +1200,13 @@ function drawTradingCard()
     love.graphics.setNewFont(14)
     
     local mx, my = love.mouse.getPosition()
-    button("BACK", 110, 585, 140, 40, isInside(mx, my, 110, 585, 140, 40))
+    button("BACK", (WINDOW_W - 140)/2, 650, 140, 50, isInside(mx, my, (WINDOW_W - 140)/2, 650, 140, 50))
 end
 
 function handleTradingCardClick(x, y)
-    if isInside(x, y, 110, 585, 140, 40) then
+    if isInside(x, y, (WINDOW_W - 140)/2, 650, 140, 50) then
         STATE = "HUB"
-        addParticles(180, 605, 10, {1, 0.5, 0})
+        addParticles(WINDOW_W/2, 675, 10, {1, 0.5, 0})
     end
 end
 
@@ -1290,7 +1298,7 @@ function drawDungeon()
         local mx, my = love.mouse.getPosition()
         
         if dungeon.currentStage <= player.dungeonProgress then
-            button("FIGHT", 170, 430, 140, 50, isInside(mx, my, 170, 430, 140, 50))
+            button("FIGHT", (WINDOW_W - 140)/2, 430, 140, 50, isInside(mx, my, (WINDOW_W - 140)/2, 430, 140, 50))
         else
             love.graphics.setColor(0.5, 0.5, 0.5)
             love.graphics.printf("LOCKED - Defeat previous stage first", 0, 445, WINDOW_W, "center")
@@ -1298,12 +1306,16 @@ function drawDungeon()
         end
         
         love.graphics.printf("Select Stage:", 0, 520, WINDOW_W, "center")
+        
+        -- Center the stage selection grid - 5 columns of 70px buttons with proper spacing
+        local totalGridWidth = 5 * 70 + 4 * 10 -- 5 buttons at 70px + 4 gaps of 10px
+        local gridStartX = (WINDOW_W - totalGridWidth) / 2
         local btnY = 560
         for i = 1, 10 do
-            local btnX = 40 + ((i-1) % 5) * 80
+            local btnX = gridStartX + ((i-1) % 5) * 80
             if i > 5 then
                 btnY = 630
-                btnX = 40 + ((i-6) % 5) * 80
+                btnX = gridStartX + ((i-6) % 5) * 80
             end
             
             if i <= player.dungeonProgress then
@@ -1331,7 +1343,7 @@ function drawDungeon()
         end
         
         love.graphics.setColor(1, 1, 1)
-        button("BACK", 170, 720, 140, 50, isInside(mx, my, 170, 720, 140, 50))
+        button("BACK", (WINDOW_W - 140)/2, 720, 140, 50, isInside(mx, my, (WINDOW_W - 140)/2, 720, 140, 50))
     elseif dungeon.combat then
         local boss = bosses[dungeon.currentStage]
         
@@ -1370,12 +1382,12 @@ function drawDungeon()
         local mx, my = love.mouse.getPosition()
         
         if dungeon.currentStage < 10 then
-            button("NEXT STAGE", 140, 420, 200, 50, isInside(mx, my, 140, 420, 200, 50))
+            button("NEXT STAGE", (WINDOW_W - 200)/2, 420, 200, 50, isInside(mx, my, (WINDOW_W - 200)/2, 420, 200, 50))
         else
             love.graphics.printf("All Stages Complete!", 0, 435, WINDOW_W, "center")
         end
         
-        button("BACK TO HUB", 140, 520, 200, 50, isInside(mx, my, 140, 520, 200, 50))
+        button("BACK TO HUB", (WINDOW_W - 200)/2, 520, 200, 50, isInside(mx, my, (WINDOW_W - 200)/2, 520, 200, 50))
     elseif dungeon.lost then
         love.graphics.setColor(1, 0.3, 0.3)
         love.graphics.printf("DEFEATED!", 0, 250, WINDOW_W, "center")
@@ -1385,7 +1397,7 @@ function drawDungeon()
         love.graphics.printf("Reset to Level 1", 0, 380, WINDOW_W, "center")
         
         local mx, my = love.mouse.getPosition()
-        button("RETURN", 170, 480, 140, 50, isInside(mx, my, 170, 480, 140, 50))
+        button("RETURN", (WINDOW_W - 140)/2, 480, 140, 50, isInside(mx, my, (WINDOW_W - 140)/2, 480, 140, 50))
     end
 end
 
@@ -1393,20 +1405,22 @@ function handleDungeonClick(x, y)
     if not dungeon.combat and not dungeon.won and not dungeon.lost then
         local boss = bosses[dungeon.currentStage]
         
-        if dungeon.currentStage <= player.dungeonProgress and isInside(x, y, 170, 430, 140, 50) then
+        if dungeon.currentStage <= player.dungeonProgress and isInside(x, y, (WINDOW_W - 140)/2, 430, 140, 50) then
             dungeon.combat = true
             dungeon.combatTimer = 0
-            addParticles(240, 455, 20, {1, 0, 0})
+            addParticles(WINDOW_W/2, 455, 20, {1, 0, 0})
             addShake(8)
             return
         end
         
+        local totalGridWidth = 5 * 70 + 4 * 10
+        local gridStartX = (WINDOW_W - totalGridWidth) / 2
         local btnY = 560
         for i = 1, 10 do
-            local btnX = 40 + ((i-1) % 5) * 80
+            local btnX = gridStartX + ((i-1) % 5) * 80
             if i > 5 then
                 btnY = 630
-                btnX = 40 + ((i-6) % 5) * 80
+                btnX = gridStartX + ((i-6) % 5) * 80
             end
             
             if i <= player.dungeonProgress and isInside(x, y, btnX, btnY, 70, 45) then
@@ -1422,29 +1436,29 @@ function handleDungeonClick(x, y)
             end
         end
         
-        if isInside(x, y, 170, 720, 140, 50) then
+        if isInside(x, y, (WINDOW_W - 140)/2, 720, 140, 50) then
             STATE = "HUB"
-            addParticles(240, 745, 10, {1, 0.5, 0})
+            addParticles(WINDOW_W/2, 745, 10, {1, 0.5, 0})
         end
     elseif dungeon.won then
-        if dungeon.currentStage < 10 and isInside(x, y, 140, 420, 200, 50) then
+        if dungeon.currentStage < 10 and isInside(x, y, (WINDOW_W - 200)/2, 420, 200, 50) then
             dungeon.currentStage = dungeon.currentStage + 1
             dungeon.bossMaxHealth = getBossHealth(dungeon.currentStage)
             dungeon.bossHealth = dungeon.bossMaxHealth
             dungeon.combat = false
             dungeon.won = false
-            addParticles(240, 445, 15, {0, 0.8, 1})
+            addParticles(WINDOW_W/2, 445, 15, {0, 0.8, 1})
             return
         end
         
-        if isInside(x, y, 140, 520, 200, 50) then
+        if isInside(x, y, (WINDOW_W - 200)/2, 520, 200, 50) then
             STATE = "HUB"
-            addParticles(240, 545, 15, {0, 1, 0})
+            addParticles(WINDOW_W/2, 545, 15, {0, 1, 0})
         end
     elseif dungeon.lost then
-        if isInside(x, y, 170, 480, 140, 50) then
+        if isInside(x, y, (WINDOW_W - 140)/2, 480, 140, 50) then
             STATE = "HUB"
-            addParticles(240, 505, 20, {0.5, 0.5, 0.5})
+            addParticles(WINDOW_W/2, 505, 20, {0.5, 0.5, 0.5})
         end
     end
 end
