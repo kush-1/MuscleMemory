@@ -45,6 +45,14 @@ local dungeon = {
 -- Particles System
 local particles = {}
 
+-- Particle types for different effects
+local PARTICLE_TYPES = {
+    STANDARD = "standard",
+    CONFETTI = "confetti",
+    STAR = "star",
+    EXPLOSION = "explosion"
+}
+
 -- Screen Shake
 local shake = {
     timer = 0,
@@ -554,6 +562,13 @@ function button(text, x, y, w, h, hovered)
     local color = hovered and {0.3, 0.5, 0.8} or {0.2, 0.3, 0.5}
     love.graphics.setColor(color)
     love.graphics.rectangle("fill", x, y, w, h, 5)
+    
+    -- Add glow effect on hover
+    if hovered then
+        love.graphics.setColor(0.4, 0.6, 1, 0.3)
+        love.graphics.rectangle("fill", x - 2, y - 2, w + 4, h + 4, 6)
+    end
+    
     love.graphics.setColor(1, 1, 1)
     love.graphics.rectangle("line", x, y, w, h, 5)
     love.graphics.printf(text, x, y + h/2 - 10, w, "center")
@@ -563,16 +578,71 @@ function isInside(mx, my, x, y, w, h)
     return mx >= x and mx <= x + w and my >= y and my <= y + h
 end
 
-function addParticles(x, y, count, color)
+function addParticles(x, y, count, color, ptype)
+    ptype = ptype or PARTICLE_TYPES.STANDARD
+    
     for i = 1, count do
-        table.insert(particles, {
-            x = x,
-            y = y,
-            vx = (math.random() - 0.5) * 200,
-            vy = (math.random() - 0.5) * 200 - 100,
-            life = 1,
-            color = color or {1, 1, 0}
-        })
+        local size = math.random(2, 5)
+        local speed = math.random(100, 300)
+        local angle = math.random() * math.pi * 2
+        
+        if ptype == PARTICLE_TYPES.CONFETTI then
+            -- Confetti shoots upward and outward
+            table.insert(particles, {
+                x = x,
+                y = y,
+                vx = (math.random() - 0.5) * 300,
+                vy = -math.random(150, 400),
+                life = math.random(10, 20) / 10,
+                color = color or {math.random(), math.random(), math.random()},
+                size = math.random(3, 7),
+                rotation = math.random() * math.pi * 2,
+                rotSpeed = (math.random() - 0.5) * 10,
+                type = ptype
+            })
+        elseif ptype == PARTICLE_TYPES.STAR then
+            -- Stars sparkle and float
+            table.insert(particles, {
+                x = x + (math.random() - 0.5) * 100,
+                y = y + (math.random() - 0.5) * 100,
+                vx = (math.random() - 0.5) * 150,
+                vy = -math.random(50, 150),
+                life = math.random(15, 25) / 10,
+                color = color or {1, 1, math.random(0.5, 1)},
+                size = math.random(4, 8),
+                rotation = 0,
+                rotSpeed = math.random(5, 10),
+                type = ptype
+            })
+        elseif ptype == PARTICLE_TYPES.EXPLOSION then
+            -- Explosions radiate outward
+            table.insert(particles, {
+                x = x,
+                y = y,
+                vx = math.cos(angle) * speed * 1.5,
+                vy = math.sin(angle) * speed * 1.5,
+                life = math.random(10, 20) / 10,
+                color = color or {math.random(0.8, 1), math.random(0.3, 0.6), math.random(0, 0.3)},
+                size = math.random(5, 12),
+                rotation = angle,
+                rotSpeed = (math.random() - 0.5) * 8,
+                type = ptype
+            })
+        else
+            -- Standard particles
+            table.insert(particles, {
+                x = x,
+                y = y,
+                vx = (math.random() - 0.5) * 200,
+                vy = (math.random() - 0.5) * 200 - 100,
+                life = 1,
+                color = color or {1, 1, 0},
+                size = size,
+                rotation = 0,
+                rotSpeed = 0,
+                type = ptype
+            })
+        end
     end
 end
 
@@ -581,8 +651,21 @@ function updateParticles(dt)
         local p = particles[i]
         p.x = p.x + p.vx * dt
         p.y = p.y + p.vy * dt
-        p.vy = p.vy + 300 * dt
-        p.life = p.life - dt * 2
+        
+        -- Apply gravity
+        if p.type == PARTICLE_TYPES.CONFETTI or p.type == PARTICLE_TYPES.STAR then
+            p.vy = p.vy + 400 * dt
+        else
+            p.vy = p.vy + 300 * dt
+        end
+        
+        -- Update rotation
+        p.rotation = p.rotation + p.rotSpeed * dt
+        
+        -- Decay life
+        local decayRate = p.type == PARTICLE_TYPES.STAR and 0.8 or 2
+        p.life = p.life - dt * decayRate
+        
         if p.life <= 0 then
             table.remove(particles, i)
         end
@@ -591,8 +674,34 @@ end
 
 function drawParticles()
     for _, p in ipairs(particles) do
+        love.graphics.push()
+        love.graphics.translate(p.x, p.y)
+        love.graphics.rotate(p.rotation)
+        
         love.graphics.setColor(p.color[1], p.color[2], p.color[3], p.life)
-        love.graphics.circle("fill", p.x, p.y, 3)
+        
+        if p.type == PARTICLE_TYPES.STAR then
+            -- Draw star shape
+            local points = 5
+            local outerRadius = p.size
+            local innerRadius = p.size * 0.4
+            local verts = {}
+            for i = 0, points * 2 - 1 do
+                local angle = (i * math.pi / points) - math.pi / 2
+                local radius = (i % 2 == 0) and outerRadius or innerRadius
+                table.insert(verts, math.cos(angle) * radius)
+                table.insert(verts, math.sin(angle) * radius)
+            end
+            love.graphics.polygon("fill", verts)
+        elseif p.type == PARTICLE_TYPES.CONFETTI then
+            -- Draw rectangle confetti
+            love.graphics.rectangle("fill", -p.size/2, -p.size/2, p.size, p.size * 1.5)
+        else
+            -- Draw circle
+            love.graphics.circle("fill", 0, 0, p.size)
+        end
+        
+        love.graphics.pop()
     end
     love.graphics.setColor(1, 1, 1)
 end
@@ -624,7 +733,7 @@ function updatePlayerLevel()
     player.health = player.maxHealth
     
     if player.level > oldLevel then
-        addParticles(WINDOW_W/2, WINDOW_H/2, 30, {1, 1, 0})
+        addParticles(WINDOW_W/2, WINDOW_H/2, 50, {1, 1, 0}, PARTICLE_TYPES.STAR)
         addShake(8)
     end
 end
@@ -736,7 +845,7 @@ end
 function handleStartClick(x, y)
     if isInside(x, y, (WINDOW_W - 200)/2, 450, 200, 60) then
         STATE = "PICK_PET"
-        addParticles(WINDOW_W/2, 480, 15, {0, 1, 1})
+        addParticles(WINDOW_W/2, 480, 30, {0, 1, 1}, PARTICLE_TYPES.STAR)
     end
 end
 
@@ -789,7 +898,7 @@ function handlePickPetClick(x, y)
         if isInside(x, y, px - 60, py - 60, 120, 120) then
             player.animal = animal.id
             nameActive = true
-            addParticles(px, py, 20, {1, 0.5, 0})
+            addParticles(px, py, 40, {1, 0.5, 0}, PARTICLE_TYPES.CONFETTI)
             return
         end
         py = py + 140
@@ -801,7 +910,7 @@ function handlePickPetClick(x, y)
         updatePlayerLevel()
         saveGame()
         STATE = "HUB"
-        addParticles(WINDOW_W/2, 755, 25, {0, 1, 0})
+        addParticles(WINDOW_W/2, 755, 50, {0, 1, 0}, PARTICLE_TYPES.STAR)
     end
 end
 
@@ -952,7 +1061,7 @@ function handleGymClick(x, y)
     for _, btn in ipairs(wBtns) do
         if isInside(x, y, btn.x, btn.y, btn.w, btn.h) then
             gymWeight = math.max(0, gymWeight + btn.val)
-            addParticles(btn.x + btn.w/2, btn.y + btn.h/2, 5, {0.5, 0.5, 1})
+            addParticles(btn.x + btn.w/2, btn.y + btn.h/2, 10, {0.5, 0.5, 1})
             return
         end
     end
@@ -969,7 +1078,7 @@ function handleGymClick(x, y)
     for _, btn in ipairs(rBtns) do
         if isInside(x, y, btn.x, btn.y, btn.w, btn.h) then
             gymReps = math.max(0, gymReps + btn.val)
-            addParticles(btn.x + btn.w/2, btn.y + btn.h/2, 8, {1, 0.8, 0})
+            addParticles(btn.x + btn.w/2, btn.y + btn.h/2, 15, {1, 0.8, 0}, PARTICLE_TYPES.STAR)
             addShake(3)
             return
         end
@@ -988,7 +1097,7 @@ function handleGymClick(x, y)
         })
         
         updatePlayerLevel()
-        addParticles(WINDOW_W/2, 515, 40, {0, 1, 0})
+        addParticles(WINDOW_W/2, 515, 80, {0, 1, 0}, PARTICLE_TYPES.CONFETTI)
         addShake(10)
         
         gymReps = 0
@@ -1205,7 +1314,7 @@ function drawTradingCard()
     
     love.graphics.setColor(0.2, 0.2, 0.2)
     love.graphics.setNewFont(16)
-    love.graphics.print("Recent Lifts", cardX + 30, cardY + 355)
+    love.graphics.print("Recent Workouts", cardX + 30, cardY + 355)
     love.graphics.setNewFont(10)
     
     y = cardY + 380
