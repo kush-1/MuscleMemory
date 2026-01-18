@@ -729,7 +729,7 @@ end
 function updatePlayerLevel()
     local oldLevel = player.level
     player.level = calculateLevel()
-    player.maxHealth = (player.level) * math.floor(player.maxLift / 100)
+    player.maxHealth = (player.level) * 40
     player.health = player.maxHealth
     
     if player.level > oldLevel then
