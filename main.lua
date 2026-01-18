@@ -69,15 +69,15 @@ local animals = {
 -- Boss Data with names and characteristics
 local bosses = {
     {name = "Iron Golem", level = 10, color = {0.5, 0.5, 0.5}},
-    {name = "Shadow Beast", level = 20, color = {0.3, 0.2, 0.4}},
-    {name = "Fire Dragon", level = 30, color = {0.9, 0.3, 0.1}},
-    {name = "Thunder Titan", level = 40, color = {0.8, 0.8, 0.2}},
-    {name = "Ice Colossus", level = 50, color = {0.4, 0.7, 0.9}},
-    {name = "Ancient Wyrm", level = 60, color = {0.5, 0.8, 0.3}},
-    {name = "Chaos Lord", level = 70, color = {0.7, 0.2, 0.7}},
-    {name = "Void Emperor", level = 80, color = {0.1, 0.1, 0.2}},
-    {name = "Ultimate Champion", level = 90, color = {1, 0.8, 0}},
-    {name = "Eternal Overlord", level = 100, color = {0.9, 0.1, 0.1}}
+    {name = "Shadow Beast", level = 30, color = {0.3, 0.2, 0.4}},
+    {name = "Fire Dragon", level = 50, color = {0.9, 0.3, 0.1}},
+    {name = "Thunder Titan", level = 100, color = {0.8, 0.8, 0.2}},
+    {name = "Ice Colossus", level = 175, color = {0.4, 0.7, 0.9}},
+    {name = "Ancient Wyrm", level = 275, color = {0.5, 0.8, 0.3}},
+    {name = "Chaos Lord", level = 400, color = {0.7, 0.2, 0.7}},
+    {name = "Void Emperor", level = 550, color = {0.1, 0.1, 0.2}},
+    {name = "Ultimate Champion", level = 725, color = {1, 0.8, 0}},
+    {name = "Eternal Overlord", level = 1000, color = {0.9, 0.1, 0.1}}
 }
 
 -- ============================================================================
