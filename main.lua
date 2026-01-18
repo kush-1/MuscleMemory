@@ -608,13 +608,13 @@ function updateShake(dt)
 end
 
 function calculateLevel()
-    return math.floor(player.totalReps / 100) + 1
+    return math.floor(((player.totalReps / 100) + 1) + ((player.maxLift / 100) + 1))
 end
 
 function updatePlayerLevel()
     local oldLevel = player.level
     player.level = calculateLevel()
-    player.maxHealth = 100 + (player.level - 1) * 20
+    player.maxHealth = 100 + (player.level - 1) * 20 
     player.health = player.maxHealth
     
     if player.level > oldLevel then
